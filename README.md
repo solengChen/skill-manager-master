@@ -1,246 +1,148 @@
----
-name: "技能管理大师"
-description: "智能管理和组合AI技能的工具。当用户需要管理技能、选择合适技能组合、安装新技能或需要技能推荐时调用此技能。优先分析需求而非滥用技能，核心目标是高效完成任务。调用时先执行 sync_skills.py 检查技能状态，然后根据结果更新技能表。"
----
+# Skill Manager - Installation Package
 
-# 技能管理大师
+## 📦 Package Contents
 
-技能管理大师是一个智能的技能管理和组合工具，旨在帮助用户更有效地使用 AI Agent 技能生态系统。
+```
+skill-manager-package/
+├── SKILL.md                    # Skill definition file (core)
+├── scripts/                    # Python scripts directory
+│   ├── scan_skills.py         # Skill scanning script
+│   ├── update_skill_table.py  # Skill table update script
+│   └── sync_skills.py         # Sync check script
+├── 安装说明.md                 # Chinese installation guide
+├── README.md                  # English installation guide
+├── install.bat                # Windows quick install script
+└── install.sh                # Linux/Mac install script (alternative)
+```
 
-## 核心原则
+## 🚀 Quick Install (Windows)
 
-### 1. 需求优先分析
-在调用任何技能之前，必须先深入理解用户需求：
-- 明确用户的核心目标和期望结果
-- 分析任务的复杂度和所需技能类型
-- 评估是否真的需要调用技能（避免过度工程化）
+### Method 1: Using Install Script
+```cmd
+# Enter the package directory and double-click install.bat
+# Or run in command line:
+install.bat
+```
 
-### 2. 技能智能组合
-根据任务需求，智能选择和组合技能：
-- 单技能适用：简单、明确的任务
-- 多技能组合：复杂、跨领域的任务
-- 技能执行顺序：根据依赖关系和逻辑流程安排
+### Method 2: Manual Installation
+```cmd
+# 1. Create global skills directory
+mkdir %USERPROFILE%\.agents\skills\skill-manager
 
-### 3. 技能表管理
-维护和更新可用的技能库：
-- 记录已安装的技能及其功能
-- 追踪技能的使用频率和效果
-- 识别技能缺口并推荐安装
-- **自动同步**：每次调用时自动检查技能状态
+# 2. Copy all files to that directory
+copy SKILL.md %USERPROFILE%\.agents\skills\skill-manager\
+copy scripts\* %USERPROFILE%\.agents\skills\skill-manager\
 
-### 4. 任务导向思维
-始终以完成目标为导向：
-- 避免为使用技能而使用技能
-- 优先选择最简单有效的解决方案
-- 注重结果而非过程
+# 3. Run update script to initialize skill table
+python %USERPROFILE%\.agents\skills\skill-manager\update_skill_table.py
+```
 
-## 工具脚本
+## 📋 Installation Requirements
 
-技能管理大师包含以下 Python 脚本：
+### Required Environment
+- **Python 3.6+**
+- **PyYAML** (for parsing YAML frontmatter)
 
-| 脚本名称 | 功能 | 使用场景 |
-|---------|------|---------|
-| `scan_skills.py` | 扫描系统已安装的技能 | 获取最新技能列表 |
-| `update_skill_table.py` | 更新技能管理表 | 安装新技能后调用 |
-| `sync_skills.py` | 对比技能表与实际状态 | 检查是否需要同步 |
+### Install PyYAML
+```bash
+pip install pyyaml
+```
 
-### 脚本调用方式
+## ✅ Verify Installation
+
+After installation, run the following command to verify:
+```bash
+python %USERPROFILE%\.agents\skills\skill-manager\sync_skills.py
+```
+
+Should output something like:
+```json
+{
+  "installed_count": 5,
+  "recorded_count": 5,
+  "new_skills": [],
+  "removed_skills": [],
+  "changed_skills": [],
+  "needs_sync": false
+}
+```
+
+## 🎯 Usage
+
+### Call Skill Manager
+In Trae AI Agent, you can:
+1. Call "Skill Manager" through Trae's skill system
+2. Or use script commands directly
+
+### Common Commands
 
 ```bash
-# 扫描技能
-python ~/.agents/skills/技能管理大师/scan_skills.py
+# Scan all installed skills
+python %USERPROFILE%\.agents\skills\skill-manager\scan_skills.py
 
-# 更新技能表
-python ~/.agents/skills/技能管理大师/update_skill_table.py
+# Update skill table (JSON + Markdown)
+python %USERPROFILE%\.agents\skills\skill-manager\update_skill_table.py
 
-# 同步检查
-python ~/.agents/skills/技能管理大师/sync_skills.py
+# Check sync status
+python %USERPROFILE%\.agents\skills\skill-manager\sync_skills.py
 ```
 
-## 工作流程
+## 📖 Features
 
-### 第一步：技能状态同步
-```
-1. 执行命令: python ~/.agents/skills/技能管理大师/sync_skills.py
-2. 检查输出中的 needs_sync 字段
-3. 如果 needs_sync 为 true，执行: python ~/.agents/skills/技能管理大师/update_skill_table.py
-4. 读取更新后的技能表 (~/.agents/skills/技能管理大师/skill_table.json)
-```
+### 1. Automatic Skill Scanning
+- Scan global skills directory: `~/.agents/skills/`
+- Scan project-local skills directory: `./.trae/skills/`
+- Parse SKILL.md frontmatter to get skill information
 
-### 第二步：需求理解
-```
-1. 仔细聆听用户的需求描述
-2. 提取关键任务目标和约束条件
-3. 明确成功的衡量标准
-4. 评估任务的优先级和紧急程度
-```
+### 2. Skill Table Management
+- JSON format: `skill_table.json` (for program reading)
+- Markdown format: `技能管理表.md` (for human reading)
+- Auto-categorization: AI, Dev Tools, Testing, Cloud Services, etc.
 
-### 第三步：技能匹配
-```
-1. 分析任务所需的技能类型
-2. 检查已更新的技能表 (skill_table.json)
-3. 识别缺失的技能
-4. 制定技能组合策略
-```
+### 3. Sync Check
+- Detect new skills
+- Detect removed skills
+- Detect skill description changes
+- needs_sync flag to remind updates
 
-### 第四步：技能安装（如需要）
-```
-1. 获取缺失技能的安装信息
-2. 执行技能安装命令
-3. 验证技能安装成功
-4. 执行命令: python ~/.agents/skills/技能管理大师/update_skill_table.py
-5. 更新本地技能表
-```
+### 4. Requirement-First Analysis
+- Understand user requirements first
+- Analyze task complexity and required skill types
+- Evaluate if skills are really needed (avoid over-engineering)
 
-### 第五步：技能执行
-```
-1. 按照逻辑顺序调用技能
-2. 监控技能执行状态
-3. 处理技能间的数据传递
-4. 协调多技能协作
+## 🛠️ Customization
+
+### Modify Classification Keywords
+Edit keyword lists in `scripts/update_skill_table.py`:
+
+```python
+ai_keywords = ['ai', 'image', 'face', 'generate', ...]
+dev_keywords = ['code', 'develop', 'design', ...]
+# Add or modify keywords to fit your needs
 ```
 
-### 第六步：结果整合
-```
-1. 汇总各技能的输出结果
-2. 验证结果是否符合需求
-3. 提供最终解决方案
-4. 记录经验供后续参考
-```
+### Modify Scan Directories
+Edit `scripts/scan_skills.py` to add more scan paths:
 
-## 技能管理功能
-
-### 技能表维护
-```markdown
-技能表结构（JSON格式）：
-- total: 技能总数
-- skills: 技能列表
-  - name: 技能名称
-  - description: 功能描述
-  - path: 安装路径
-  - status: 安装状态
-- update_time: 更新时间
+```python
+# In scan_skills() function, add
+custom_skills_dir = Path('your/custom/path')
+installed_skills.extend(scan_directory(custom_skills_dir))
 ```
 
-### 技能推荐系统
-基于用户需求，推荐最合适的技能：
-- 分析需求关键词
-- 匹配技能功能
-- 考虑技能兼容性和性能
-- 提供多个方案供选择
+## ❓ FAQ
 
-### 技能安装管理
-自动处理技能安装流程：
-- 识别缺失技能
-- 获取安装命令
-- 执行安装过程
-- 验证安装结果
-- 自动更新技能表
+### Q: Can't find skill after installation?
+A: Make sure files are copied to correct location: `%USERPROFILE%\.agents\skills\skill-manager\`
 
-## 常用技能组合模板
+### Q: Python scripts won't run?
+A: Make sure Python and PyYAML are installed. Run `pip install pyyaml` to reinstall dependencies
 
-### 前端开发组合
-- frontend-design + vercel-react-best-practices + web-design-guidelines
-- 适用于：Web 应用开发和界面设计
+### Q: How to uninstall?
+A: Simply delete `%USERPROFILE%\.agents\skills\skill-manager\` directory
 
-### 云服务组合
-- azure-compute + azure-validate + azure-cost-optimization
-- 适用于：Azure 云平台部署和管理
+---
 
-### 代码质量组合
-- tdd + grill-me + improve-codebase-architecture
-- 适用于：代码审查和架构优化
-
-### AI 功能组合
-- ai-image-generation + brainstorming + find-skills
-- 适用于：AI 应用开发和创意工作
-
-## 决策指南
-
-### 使用技能的情况
-- ✅ 任务复杂，需要专业知识
-- ✅ 存在多个可用的技能解决方案
-- ✅ 用户明确要求使用特定技能
-- ✅ 技能能显著提高效率
-
-### 不使用技能的情况
-- ❌ 任务简单，直接完成即可
-- ❌ 使用技能反而增加复杂度
-- ❌ 技能功能与需求不匹配
-- ❌ 用户未明确要求且不使用技能也能完成
-
-## 交互模式
-
-### 初始同步
-```
-技能管理大师：正在同步技能状态...
-[执行 sync_skills.py]
-[如果需要更新，执行 update_skill_table.py]
-[读取技能表，共 X 个技能]
-```
-
-### 需求分析
-```
-技能管理大师：让我先理解您的需求...
-[分析用户需求]
-[询问必要细节]
-[制定技能方案]
-```
-
-### 执行中反馈
-```
-技能管理大师：正在为您配置技能...
-[技能A - 完成]
-[技能B - 执行中]
-[技能C - 等待中]
-```
-
-### 完成总结
-```
-技能管理大师：任务已完成！
-[使用技能]：技能1、技能2
-[执行时间]：X分钟
-[结果质量]：符合预期
-[建议反馈]：...
-```
-
-## 技能更新和维护
-
-### 定期检查
-- 每次调用时自动检查技能状态
-- 更新技能到最新版本
-- 清理不常用的技能
-- 优化技能组合策略
-
-### 经验积累
-- 记录成功的技能组合
-- 分析失败的原因
-- 优化决策流程
-- 完善技能表数据
-
-## 安全和最佳实践
-
-### 权限管理
-- 检查技能所需权限
-- 评估安全风险
-- 在安全范围内操作
-
-### 资源优化
-- 避免同时启动过多技能
-- 选择资源效率高的方案
-- 监控技能执行性能
-
-### 错误处理
-- 预设错误处理流程
-- 提供降级方案
-- 记录错误日志供分析
-
-## 总结
-
-技能管理大师的核心价值在于：
-1. **智能分析** - 深入理解用户需求，而非盲目使用技能
-2. **精准匹配** - 选择最合适的技能组合，避免资源浪费
-3. **高效执行** - 优化技能执行流程，提升工作效率
-4. **自动同步** - 每次调用时自动更新技能状态，确保数据最新
-
-记住：技能是工具，完成任务才是目标。技能管理大师始终以用户需求为中心，提供最优质的服务。
+**Version**: 1.0.0  
+**Created**: 2026-06-25  
+**Author**: AI Assistant
