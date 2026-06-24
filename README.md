@@ -3,7 +3,7 @@
 ## 📦 Package Contents
 
 ```
-skill-manager-package/
+skill-manager-master/
 ├── SKILL.md                    # Skill definition file (core)
 ├── scripts/                    # Python scripts directory
 │   ├── scan_skills.py         # Skill scanning script
